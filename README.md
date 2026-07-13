@@ -18,7 +18,7 @@
 
 ## What is this?
 
-물리 기반 배터리 모델을 탑재한 청소 시뮬레이터가 센서·세션 로그를 합성하고, 예측 모델이 **"예상 사용 가능 시간 + 완료 확률"**을 산출한다. 예측 모델은 설계상 온라인(지속 학습형)이며, 콜드 스타트 문제는 연합 학습으로 개선한다.
+물리 기반 배터리 모델을 탑재한 청소 시뮬레이터가 센서·세션 로그를 합성하고, 예측 모델이 예상 사용 가능 시간 + 완료 확률을 산출한다. 예측 모델은 설계상 온라인(지속 학습형)이며, 콜드 스타트 문제는 연합 학습으로 개선한다.
 
 ## Architecture
 
@@ -72,8 +72,17 @@ flowchart LR
 └── .github/workflows/     # CI PR gate · nightly eval · weekly labs · manual LLM eval
 ```
 
+## Getting started
+
+```sh
+make setup   # once: Python 3.11 venv + deps, frontend npm install
+make demo    # seed DB → FastAPI :8000 → Vite :5173
+```
+
+Also useful: `make test`, `make eval` (quick-100 metrics), `make lint`, `make golden`.
+
 ## Roadmap
-- [ ] **M0 — Core pipeline** · simulator v0, 60-session seed history, segment → base×drift → joint bootstrap, ForecastCard UI, CI gate + Vercel deploy live
+- [x] **M0 — Core pipeline** · simulator v0, 60-session seed history, segment → base×drift → joint bootstrap, ForecastCard UI, CI gate + Vercel deploy live *(code complete — CI/Vercel gates activate on first push/import)*
 - [ ] **M1 — Spatial layer** *(demo minimum)* · zone planner, trajectory heatmap, 부족A flow, next_plan carry-over
 - [ ] **M2 — Physics & evaluation** · aging/voltage/temperature channels, NASA·UNIBO calibration, eval-500 + reliability diagram + ablation
 - [ ] **M3 — LLM layer** · provider router (on-device ⇄ API ⇄ rules), guarded narration, dual-mode agent
