@@ -45,5 +45,7 @@ jobs:
         run: |
           npm run lint
           npm run format
+      - name: Accessibility — CVD contrast on the heatmap ramp (§7.3, §12.2)
+        run: npm test
       - name: Build
         run: npm run build

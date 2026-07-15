@@ -13,4 +13,4 @@ React 18 + JavaScript + Vite mobile-first web app (360–420 px) — the forecas
 - `src/api/` — REST client for backend endpoints (§6)
 - `src/storage/` — next_plan storage adapter: server | localStorage (§12.1)
 
-M0 status: scaffold + `components/` (ForecastCard, MessageBanner, ModeSelector, BatteryHeader) + `api/` client are implemented; `views/`, `llm/`, `agent/`, `storage/` hold READMEs until their milestones (M1–M5). Dev server proxies `/api` → `localhost:8000`.
+M1 status: `components/` (ForecastCard, MessageBanner, ModeSelector, BatteryHeader, **HeatmapView, PlanOverlay**), `heatmap/ramp.js` (single-source teal ramp), `api/` client + **localStorage next_plan adapter (`api/storage.js`)** are implemented. The heatmap, plan and banner all read one distribution, so they cannot disagree (§1 principle 7). Accessibility: `test/cvd.test.mjs` asserts the ramp keeps ordinal brightness with ≥15 % ΔL* under CVD simulation (`npm test`, CI gate §7.3/§12.2). `llm/`, `agent/`, `views/` hold READMEs until M3–M5. Dev server proxies `/api` → `localhost:8000`.
