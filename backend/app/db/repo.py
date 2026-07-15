@@ -1,10 +1,25 @@
 """DB rows → pure-core inputs. The only place ORM types and core types meet (§1.1)."""
 
+import json
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session as OrmSession
 
 from ..core.predict import Segment, SessionStat, Zone, extract_session_segments
+from ..geo import MapData, load_map_data
 from . import models
+
+
+def load_map(db: OrmSession) -> MapData:
+    """Reconstruct the map geometry from the persisted ``grid_maps`` row (§2.2, §12.1).
+
+    The seed-map JSON is stored in the DB so the deployed server serves heatmaps from its
+    read-only bundle without touching the filesystem or importing the simulator.
+    """
+    row = db.scalars(select(models.GridMap)).first()
+    if row is None:
+        raise LookupError("no grid_maps row — run `make db` (or POST /api/simulate)")
+    return load_map_data(json.loads(row.cells_json))
 
 
 def load_zones(db: OrmSession, zone_ids: list[int] | None = None) -> list[Zone]:
