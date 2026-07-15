@@ -136,15 +136,19 @@ def t_req_minutes(zones: list[Zone], speed, carpet_coef, dirt_coef):
     return total + travel_minutes(zones)
 
 
-def t_est_minutes(battery_pct: float, rate):
-    return np.maximum(battery_pct - config.B_RES_DEFAULT_PCT, 0.0) / rate
+def t_est_minutes(battery_pct: float, rate, b_res: float = config.B_RES_DEFAULT_PCT):
+    return np.maximum(battery_pct - b_res, 0.0) / rate
 
 
 def summarize_mode(
-    battery_pct: float, zones: list[Zone], draws: JointDraws, mode: str
+    battery_pct: float,
+    zones: list[Zone],
+    draws: JointDraws,
+    mode: str,
+    b_res: float = config.B_RES_DEFAULT_PCT,
 ) -> dict[str, float]:
     """Interval, T_req interval and completion probability for one mode from the joint draws."""
-    t_star = t_est_minutes(battery_pct, draws.rates[mode])
+    t_star = t_est_minutes(battery_pct, draws.rates[mode], b_res)
     t_req_star = t_req_minutes(zones, draws.speeds[mode], draws.carpet_coef, draws.dirt_coef)
     return {
         "t_lo_min": float(np.percentile(t_star, config.INTERVAL_LO_PCT)),
