@@ -10,6 +10,7 @@ import numpy as np
 from ... import config
 from .bootstrap import summarize_mode, t_est_minutes, t_req_minutes
 from .engine import RuleEngineV1
+from .planner import subset_feasible
 from .state import decide_state
 from .types import Segment, SessionStat, Zone
 
@@ -25,18 +26,22 @@ def predict(
     segments: list[Segment],
     session_stats: list[SessionStat],
     prev_state: str | None = None,
+    b_res: float | None = None,
     seed: int = config.PREDICT_SEED,
 ) -> dict:
+    # b_res defaults to the static reserve; the API passes the §3.2 dynamic clamp. Keeping the
+    # default here preserves the pure-core golden path (§8.3) — the API layer owns the map.
+    b_res = config.B_RES_DEFAULT_PCT if b_res is None else b_res
     engine = RuleEngineV1(segments, session_stats)
     rng = np.random.default_rng(seed)
     draws = engine.joint_draws(rng)
 
-    summaries = {m: summarize_mode(battery_pct, zones, draws, m) for m in config.MODES}
+    summaries = {m: summarize_mode(battery_pct, zones, draws, m, b_res) for m in config.MODES}
     fit = engine.fit
 
     per_mode = {}
     for m in config.MODES:
-        t_est_m = t_est_minutes(battery_pct, fit.r_tilde[m])
+        t_est_m = t_est_minutes(battery_pct, fit.r_tilde[m], b_res)
         per_mode[m] = {
             "t_est_min": _round(float(t_est_m)),
             "p_complete": _round(summaries[m]["p_complete"], 3),
@@ -44,13 +49,23 @@ def predict(
 
     p_cur = summaries[mode]["p_complete"]
     p_by_mode = {m: summaries[m]["p_complete"] for m in config.MODES}
-    state, recommended = decide_state(p_cur, p_by_mode, fit.n_eff, battery_pct, prev_state)
+    # 부족A vs 부족B (§4.1) — only consulted when no mode reaches caution, so skip the planner
+    # search entirely for sufficient/caution readings (the common case).
+    feasible = (
+        p_cur < config.P_SUFFICIENT
+        and max(p_by_mode.values()) < config.P_CAUTION
+        and battery_pct > b_res
+        and subset_feasible(battery_pct, zones, draws, b_res)
+    )
+    state, recommended = decide_state(
+        p_cur, p_by_mode, fit.n_eff, battery_pct, prev_state, feasible, b_res
+    )
 
     t_req_point = t_req_minutes(
         zones, engine.speed[mode], config.TREQ_CARPET_COEF, config.TREQ_DIRT_COEF
     )
     # Charge suggestion for the shortage banner (§4.2): reach enough SoC for a full clean.
-    needed_pct = config.B_RES_DEFAULT_PCT + float(t_req_point) * fit.r_tilde[mode] * 1.1
+    needed_pct = b_res + float(t_req_point) * fit.r_tilde[mode] * 1.1
     charge_min = max(0.0, (min(needed_pct, 100.0) - battery_pct) / config.CHARGE_RATE_PCT_MIN)
 
     cur = summaries[mode]

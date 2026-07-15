@@ -2,12 +2,14 @@
 
 from backend.app.core.predict.state import (
     CAUTION,
+    SHORTAGE_A,
     SHORTAGE_B,
     SUFFICIENT,
     decide_state,
 )
 
 P = {"eco": 0.95, "standard": 0.85, "turbo": 0.60}
+LOW = {"eco": 0.7, "standard": 0.5, "turbo": 0.3}  # no mode reaches caution
 
 
 def test_sufficient_at_nominal_threshold():
@@ -20,9 +22,20 @@ def test_caution_recommends_best_mode():
     assert state == CAUTION and rec == "eco"
 
 
-def test_shortage_when_no_mode_reaches_080():
-    state, rec = decide_state(0.5, {"eco": 0.7, "standard": 0.5, "turbo": 0.3}, 20, 50)
+def test_shortage_b_when_no_subset_completes():
+    state, rec = decide_state(0.5, LOW, 20, 50, subset_feasible=False)
     assert state == SHORTAGE_B and rec is None
+
+
+def test_shortage_a_when_a_subset_still_completes():
+    # 부족A (§4.1): no mode finishes everything, but the planner found a completable subset.
+    state, rec = decide_state(0.5, LOW, 20, 50, subset_feasible=True)
+    assert state == SHORTAGE_A and rec is None
+
+
+def test_reserve_short_circuits_to_shortage_b_even_if_subset_feasible():
+    state, _ = decide_state(0.9, LOW, 20, 2.5, subset_feasible=True, b_res=3.0)
+    assert state == SHORTAGE_B  # below reserve → charge first, regardless of subsets
 
 
 def test_hysteresis_keeps_sufficient_within_band():
