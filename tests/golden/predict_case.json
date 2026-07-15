@@ -1,0 +1,40 @@
+{
+ "engine": "rule_v1",
+ "mode": "standard",
+ "battery_pct": 42.0,
+ "t_est_min": 41.47,
+ "t_lo_min": 39.06,
+ "t_hi_min": 44.38,
+ "t_req_min": 46.92,
+ "t_req_lo": 44.15,
+ "t_req_hi": 51.95,
+ "p_complete": 0.026,
+ "state": "caution",
+ "recommended_mode": "eco",
+ "charge_min": 33.0,
+ "per_mode": {
+  "eco": {
+   "t_est_min": 60.07,
+   "p_complete": 0.996
+  },
+  "standard": {
+   "t_est_min": 41.47,
+   "p_complete": 0.026
+  },
+  "turbo": {
+   "t_est_min": 27.83,
+   "p_complete": 0.0
+  }
+ },
+ "basis": {
+  "n_eff": 8.3,
+  "segments_used": 9,
+  "ewma_halflife": 10,
+  "base_rate": 0.837,
+  "drift": 1.066,
+  "prior_weight": 0.38,
+  "interval_method": "joint_weighted_bootstrap",
+  "B": 1000,
+  "low_data": false
+ }
+}

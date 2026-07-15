@@ -1,0 +1,5 @@
+# Vercel Python function dependencies (profile W, §12.1) — deploy bundle only.
+# Local dev uses requirements-dev.txt; torch is offline-lab only and never appears here.
+fastapi>=0.115,<1
+sqlalchemy>=2.0,<3
+numpy==2.4.6

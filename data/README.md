@@ -9,4 +9,4 @@ Committed data assets plus a gitignored landing spot for raw open datasets.
 - `seed_maps/` — hand-authored JSON maps (SPEC §2.2) — **committed**
 - `calibration/` — calibration outputs `calibrated.json` + `calibration_report.md` (§2.5) — **committed**
 - `datasets/` — NASA PCoE / UNIBO raw downloads (§2.5) — **gitignored**, README only
-- `demo.db` — seed-fixed demo DB, arrives in M0 — **committed by design** (§8.6); CI re-runs `simulate --seed 42` and asserts hash equality (§12.2); bundled read-only on Vercel profile W (§12.1)
+- `demo.db` — seed-42 demo DB (60 sessions) — **committed by design** (§8.6); regenerate with `make db-regen`; CI rebuilds it and asserts canonical-hash equality (§12.2); bundled read-only on Vercel profile W (§12.1)

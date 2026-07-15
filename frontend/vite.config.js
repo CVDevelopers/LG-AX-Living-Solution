@@ -1,0 +1,13 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// Dev: Vite proxies /api to the local FastAPI (make backend). Prod (Vercel): same-origin /api.
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: { '/api': 'http://localhost:8000' },
+  },
+  preview: {
+    proxy: { '/api': 'http://localhost:8000' },
+  },
+})
