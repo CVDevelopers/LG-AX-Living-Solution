@@ -6,11 +6,10 @@ The prediction engine consumes those logs only; nothing here leaks into it (§1 
 
 from dataclasses import dataclass, field
 
-import numpy as np
-
 from backend.app import config
 
 from .battery import BatteryModel, suction_power_w, travel_power_w
+from .detrng import DetRNG
 from .world import MapData
 
 
@@ -51,9 +50,11 @@ class SimSession:
     ticks: list[SimTick] = field(default_factory=list)
 
 
-def simulate_session(world: MapData, plan: SessionPlan, rng: np.random.Generator) -> SimSession:
+def simulate_session(world: MapData, plan: SessionPlan, rng: DetRNG) -> SimSession:
     model = BatteryModel(rng, soh=plan.soh)
-    battery = plan.start_soc
+    # Battery is carried at 3-decimal resolution so the low-battery cutoff (and thus session
+    # length) is a stable function of the draw stream, not of last-ULP platform noise (§12.2).
+    battery = round(plan.start_soc, 3)
     mode = plan.mode
     t = 0
     cleaned = carpet_cleaned = 0.0
@@ -66,9 +67,9 @@ def simulate_session(world: MapData, plan: SessionPlan, rng: np.random.Generator
 
     def minute(power_w: float, zone_id: int | None, cell: tuple[int, int]) -> None:
         nonlocal battery, t
-        battery = max(0.0, battery - model.step_dsoc(power_w))
+        battery = round(max(0.0, battery - model.step_dsoc(power_w)), 3)
         t += 1
-        ticks.append(SimTick(t, round(battery, 3), zone_id, mode, 0, cell))
+        ticks.append(SimTick(t, battery, zone_id, mode, 0, cell))
 
     for i, zid in enumerate(plan.zone_ids):
         zone = world.zones[zid]
@@ -84,11 +85,13 @@ def simulate_session(world: MapData, plan: SessionPlan, rng: np.random.Generator
                 mode = plan.mode_change[1]
                 mode_changes += 1
             on_carpet = bool(rng.random() < zone.carpet_ratio)
-            avoid = int(rng.poisson(config.OBST_AVOID_PER_MIN)) if zone.has_obstacles else 0
+            # v0: obstacle avoidance as a per-minute Bernoulli event (λ≈0.3) — a stable
+            # uniform compare, unlike Poisson's platform-dependent rejection sampling (§12.2).
+            avoid = rng.bernoulli(config.OBST_AVOID_PER_MIN) if zone.has_obstacles else 0
             power = suction_power_w(mode, on_carpet, plan.dirt_by_zone[zid], float(avoid))
             speed = config.V_COVER_M2_MIN[mode] * (config.CARPET_SPEED_FACTOR if on_carpet else 1.0)
             area_step = min(speed, remaining)
-            cell = zone.cells[int(rng.integers(0, len(zone.cells)))]
+            cell = zone.cells[rng.integers(0, len(zone.cells))]
             minute(power, zid, cell)
             remaining -= area_step
             cleaned += area_step

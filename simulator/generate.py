@@ -16,13 +16,12 @@ import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import numpy as np
-
 from backend.app import config
 from backend.app.db.models import Base
 from backend.app.db.session import make_engine
 
 from .augment import sample_plan
+from .detrng import DetRNG
 from .rover import simulate_session
 from .world import MapData, load_map
 
@@ -43,7 +42,7 @@ def build_db(
         out_path.unlink()
 
     world = load_map(map_path)
-    rng = np.random.default_rng(seed)
+    rng = DetRNG(seed)
     engine = make_engine(out_path, read_only=False)
     Base.metadata.create_all(engine)
 
@@ -64,7 +63,7 @@ def build_db(
             plan = sample_plan(world, rng, allow_mode_change=allow_mode_change)
             sim = simulate_session(world, plan, rng)
             session_id = f"S{seed}-{i:04d}"
-            started = BASE_STARTED_AT + timedelta(days=i, hours=8 + int(rng.integers(0, 12)))
+            started = BASE_STARTED_AT + timedelta(days=i, hours=8 + rng.integers(0, 12))
             con.execute(
                 "INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
@@ -96,8 +95,15 @@ def build_db(
     return world
 
 
+def _cell(value) -> str:
+    # Floats are quantized to 4 decimals so the fingerprint is immune to last-ULP platform
+    # noise; every stored float is already rounded to ≤4 decimals, so no information is lost.
+    return f"{value:.4f}" if isinstance(value, float) else repr(value)
+
+
 def canonical_hash(db_path: str | Path) -> str:
-    """SHA-256 over an ordered logical dump — stable across SQLite builds."""
+    """SHA-256 over an ordered, float-quantized logical dump — stable across SQLite builds,
+    numpy versions and CPU platforms (§12.2)."""
     con = sqlite3.connect(db_path)
     h = hashlib.sha256()
     for table, order in (
@@ -110,7 +116,7 @@ def canonical_hash(db_path: str | Path) -> str:
     ):
         h.update(table.encode())
         for row in con.execute(f"SELECT * FROM {table} ORDER BY {order}"):  # noqa: S608
-            h.update(repr(row).encode())
+            h.update("|".join(_cell(v) for v in row).encode())
     con.close()
     return h.hexdigest()
 

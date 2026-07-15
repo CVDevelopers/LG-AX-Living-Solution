@@ -8,9 +8,9 @@ The AR(1) term exists so the rule model's "constant rate within a session" assum
 NOT auto-satisfied by the simulator — evaluation keeps real-world difficulty (§2.4b).
 """
 
-import numpy as np
-
 from backend.app import config
+
+from .detrng import DetRNG
 
 
 def suction_power_w(mode: str, on_carpet: bool, dirt: float, avoid_per_min: float) -> float:
@@ -35,7 +35,7 @@ class BatteryModel:
 
     P_STD_REF_W = config.P_SUCTION_W["standard"] + config.P_DRIVE_W + config.P_AUX_W
 
-    def __init__(self, rng: np.random.Generator, soh: float = 1.0):
+    def __init__(self, rng: DetRNG, soh: float = 1.0):
         self.rng = rng
         self.soh = soh
         self.eps_session = float(rng.normal(1.0, config.EPS_SESSION_SIGMA))

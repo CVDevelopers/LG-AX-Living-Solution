@@ -8,11 +8,10 @@ Review the diff before committing — a golden change is a behavior change.
 import json
 from pathlib import Path
 
-import numpy as np
-
 from backend.app import config
 from backend.app.core.predict import predict
 from simulator.battery import BatteryModel, suction_power_w
+from simulator.detrng import DetRNG
 
 from .inputs import golden_inputs
 
@@ -28,7 +27,7 @@ def regen_predict() -> None:
 
 
 def regen_discharge() -> None:
-    rng = np.random.default_rng(config.DEMO_SEED)
+    rng = DetRNG(config.DEMO_SEED)
     model = BatteryModel(rng)
     power = suction_power_w("standard", False, 50.0, 0.0)
     battery, curve = 100.0, [100.0]

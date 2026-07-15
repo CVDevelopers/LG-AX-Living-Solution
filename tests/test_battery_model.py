@@ -8,6 +8,7 @@ import pytest
 
 from backend.app import config
 from simulator.battery import BatteryModel, suction_power_w
+from simulator.detrng import DetRNG
 
 GOLDEN = Path(__file__).parent / "golden" / "discharge_curve.json"
 
@@ -27,7 +28,7 @@ def test_carpet_increases_power():
 def test_mean_rates_match_reference_profile():
     """Hardfloor, dirt 0, SoH 1.0 → §2.4b reference rates 0.55/0.75/1.20 %/min within 5 %."""
     for mode, ref in config.R_PRIOR_PCT_MIN.items():
-        rng = np.random.default_rng(99)
+        rng = DetRNG(99)
         model = BatteryModel(rng)
         model.eps_session = 1.0  # isolate the deterministic part
         power = suction_power_w(mode, False, 0.0, 0.0)
@@ -36,7 +37,7 @@ def test_mean_rates_match_reference_profile():
 
 
 def test_ar1_noise_is_autocorrelated():
-    rng = np.random.default_rng(7)
+    rng = DetRNG(7)
     model = BatteryModel(rng)
     power = suction_power_w("standard", False, 50.0, 0.0)
     rates = np.array([model.step_dsoc(power) for _ in range(500)])
@@ -47,7 +48,7 @@ def test_ar1_noise_is_autocorrelated():
 
 def test_discharge_curve_snapshot():
     """Fixed-seed 30-minute standard-mode curve pinned to a committed golden file (§8.3)."""
-    rng = np.random.default_rng(config.DEMO_SEED)
+    rng = DetRNG(config.DEMO_SEED)
     model = BatteryModel(rng)
     power = suction_power_w("standard", False, 50.0, 0.0)
     battery, curve = 100.0, [100.0]
