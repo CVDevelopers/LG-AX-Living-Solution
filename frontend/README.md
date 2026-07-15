@@ -13,4 +13,4 @@ React 18 + JavaScript + Vite mobile-first web app (360–420 px) — the forecas
 - `src/api/` — REST client for backend endpoints (§6)
 - `src/storage/` — next_plan storage adapter: server | localStorage (§12.1)
 
-Scaffolding note: Vite project files (`package.json`, `vite.config.js`, `index.html`, …) arrive in M0.
+M0 status: scaffold + `components/` (ForecastCard, MessageBanner, ModeSelector, BatteryHeader) + `api/` client are implemented; `views/`, `llm/`, `agent/`, `storage/` hold READMEs until their milestones (M1–M5). Dev server proxies `/api` → `localhost:8000`.
