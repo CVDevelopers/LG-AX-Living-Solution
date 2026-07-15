@@ -2,15 +2,16 @@
 
 # 🔋⛅ RoboVac Battery Forecast
 
-**로봇청소기 배터리를 일기예보처럼 — "예상 사용 가능 시간 + 완료 확률"**
+**로봇청소기 배터리를 일기예보처럼 — 예상 사용 가능 시간 + 완료 확률**
 
-![React](https://img.shields.io/badge/React_18-61DAFB?logo=react&logoColor=black)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
-![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
-![Python](https://img.shields.io/badge/Python_3.11-3776AB?logo=python&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch_·_offline_lab-EE4C2C?logo=pytorch&logoColor=white)
+[![React](https://img.shields.io/badge/React-18.3-blue.svg)](https://react.dev/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Vite](https://img.shields.io/badge/Vite-5.4-purple.svg)](https://vite.dev/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com/)
+[![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
+[![SQLite](https://img.shields.io/badge/SQLite-3-blue.svg)](https://www.sqlite.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-Offline--Lab-red.svg)](https://pytorch.org/)
+
 
 </div>
 
@@ -83,7 +84,7 @@ Also useful: `make test`, `make eval` (quick-100 metrics), `make lint`, `make go
 
 ## Roadmap
 - [x] **M0 — Core pipeline** · simulator v0, 60-session seed history, segment → base×drift → joint bootstrap, ForecastCard UI, CI gate + Vercel deploy live *(code complete — CI/Vercel gates activate on first push/import)*
-- [ ] **M1 — Spatial layer** *(demo minimum)* · zone planner, trajectory heatmap, 부족A flow, next_plan carry-over
+- [x] **M1 — Spatial layer** *(demo minimum)* · zone planner, trajectory heatmap, 부족A flow, next_plan carry-over
 - [ ] **M2 — Physics & evaluation** · aging/voltage/temperature channels, NASA·UNIBO calibration, eval-500 + reliability diagram + ablation
 - [ ] **M3 — LLM layer** · provider router (on-device ⇄ API ⇄ rules), guarded narration, dual-mode agent
 - [ ] **M4 — Learning engines & XAI** · v2 RLS + v3 LSTM behind a 5-condition promotion gate, SHAP `/explain`, "예보가 빗나간 날" demo
