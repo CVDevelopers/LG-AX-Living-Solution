@@ -5,8 +5,9 @@ caution while any mode reaches P ≥ 0.80. Schmitt hysteresis: promotion happens
 nominal threshold, demotion only once P falls 5 %p below it — so 92 % always reads
 "sufficient" while readings hovering near a boundary cannot oscillate.
 
-M0 note: without the M1 subset planner, every insufficient case is SHORTAGE_B;
-SHORTAGE_A ("some zone subset still completes") is refined in M1 (§5.1).
+Below the caution threshold the split is 부족A vs 부족B (§4.1): 부족A when the §5.1 planner
+finds a zone subset that still completes at ≥ 0.90 in some mode (``subset_feasible``),
+otherwise 부족B (charge first). Feasibility is decided on the same joint distribution.
 """
 
 from ... import config as cfg
@@ -25,26 +26,26 @@ def decide_state(
     n_eff: float,
     battery_pct: float,
     prev_state: str | None = None,
+    subset_feasible: bool = False,
+    b_res: float = cfg.B_RES_DEFAULT_PCT,
 ) -> tuple[str, str | None]:
-    """Return (state, recommended_mode)."""
+    """Return (state, recommended_mode). ``subset_feasible`` (§5.1) splits 부족A from 부족B."""
     p_max = max(p_by_mode.values())
     best_mode = max(p_by_mode, key=p_by_mode.get)
 
-    if battery_pct <= cfg.B_RES_DEFAULT_PCT:
+    if battery_pct <= b_res:
         state = SHORTAGE_B
     elif p_cur >= cfg.P_SUFFICIENT:
         state = SUFFICIENT
     elif p_max >= cfg.P_CAUTION:
         state = CAUTION
+    elif subset_feasible:
+        state = SHORTAGE_A
     else:
         state = SHORTAGE_B
 
     # Schmitt band: keep the previous (better) state while within θ − 5 %p of its threshold.
-    if (
-        prev_state in _RANK
-        and _RANK[prev_state] > _RANK[state]
-        and battery_pct > cfg.B_RES_DEFAULT_PCT
-    ):
+    if prev_state in _RANK and _RANK[prev_state] > _RANK[state] and battery_pct > b_res:
         if prev_state == SUFFICIENT and p_cur >= cfg.P_SUFFICIENT - cfg.HYSTERESIS_PCT_PT:
             state = SUFFICIENT
         elif prev_state == CAUTION and p_max >= cfg.P_CAUTION - cfg.HYSTERESIS_PCT_PT:
