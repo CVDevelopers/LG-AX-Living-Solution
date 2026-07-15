@@ -296,3 +296,126 @@ body {
   font-size: 0.7rem;
   color: var(--ink-soft);
 }
+
+/* Heatmap (§5.2, §7.3) */
+.heatmap-card {
+  padding: 12px;
+}
+.heatmap-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+.heatmap-sub {
+  font-weight: 500;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+.heatmap-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #f0f3f5;
+  border-radius: 10px;
+}
+.heatmap-svg .zone-name {
+  fill: #0b2b28;
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: rgb(255 255 255 / 65%);
+  stroke-width: 0.08;
+}
+.heatmap-svg .zone-pct {
+  fill: #06201d;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: rgb(255 255 255 / 75%);
+  stroke-width: 0.1;
+}
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 8px;
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+}
+.legend-label {
+  margin-right: 4px;
+}
+.legend-swatch {
+  width: 22px;
+  height: 12px;
+  border-radius: 2px;
+}
+.legend-ends {
+  margin-left: 6px;
+}
+
+/* 부족A plan overlay (§4.2, §5.1) */
+.plan-overlay {
+  border: 1px solid #f2c2c2;
+  background: var(--bad-bg);
+}
+.plan-head {
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.plan-summary {
+  margin: 6px 0 12px;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+.plan-summary strong {
+  color: var(--teal-700);
+}
+.plan-actions {
+  display: flex;
+  gap: 8px;
+}
+.plan-leftover {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed #e2c7c7;
+}
+.leftover-label {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+.zone-chip {
+  font-size: 0.75rem;
+  background: #fff;
+  border: 1px solid #d4d9de;
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+.btn.small {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+}
+
+/* Carryover suggestion (§4.2 이월) */
+.banner.carryover {
+  background: var(--teal-100);
+  color: var(--teal-700);
+}
+.banner.carryover p {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.app-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 10;
+}

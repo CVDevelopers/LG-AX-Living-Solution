@@ -3,7 +3,7 @@ export default function BatteryHeader({ battery, onChange }) {
     <header className="header">
       <div className="header-row">
         <h1>
-          🔋⛅ 배터리 기상 예보 <span className="tag">M0</span>
+          🔋⛅ 배터리 기상 예보 <span className="tag">M1</span>
         </h1>
         <span className="battery-pill">{battery}%</span>
       </div>
