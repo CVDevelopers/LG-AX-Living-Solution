@@ -3,9 +3,23 @@ import { useState } from 'react'
 const MODE_KO = { eco: '에코', standard: '표준', turbo: '터보' }
 
 // §4.2 message policy: no failure framing, always offer a choice.
-function content(f) {
+function content(f, plan) {
   const pCur = Math.round(f.p_complete * 100)
   switch (f.state) {
+    case 'shortage_a': {
+      // 부족A (§4.2): some zone subset still completes — steer to the plan, not to failure.
+      const names = plan?.zones?.map((z) => z.name).join('·')
+      const pS = plan ? Math.round(plan.p_complete * 100) : null
+      return {
+        cls: 'bad',
+        icon: '🪫',
+        head: '구역 선택 권장',
+        body: names
+          ? `지금 배터리로는 ${names}만 완결할 수 있어요 (확률 ${pS}%). 마치고 충전할까요?`
+          : '지금 배터리로는 일부 구역만 완결할 수 있어요. 아래에서 구역과 경로를 확인하세요.',
+        actions: [{ label: '충전 먼저', kind: 'ghost', act: 'toast' }],
+      }
+    }
     case 'sufficient':
       return {
         cls: 'ok',
@@ -35,7 +49,7 @@ function content(f) {
       }
     }
     default:
-      // M0에서는 부족A(구역 선택)가 M1 플래너와 함께 도착 — 부족B 메시지로 안내 (§13).
+      // 부족B (§4.2): no zone subset completes → charge first.
       return {
         cls: 'bad',
         icon: '🔌',
@@ -48,12 +62,12 @@ function content(f) {
   }
 }
 
-export default function MessageBanner({ forecast, onSwitchMode }) {
+export default function MessageBanner({ forecast, plan, onSwitchMode }) {
   const [dismissedFor, setDismissedFor] = useState(null)
   const [toast, setToast] = useState(null)
   if (!forecast) return null
 
-  const c = content(forecast)
+  const c = content(forecast, plan)
   const key = `${forecast.state}:${forecast.recommended_mode ?? ''}`
   if (dismissedFor === key) return null
 
