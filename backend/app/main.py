@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from . import config
 from .api.routes import router
 
-app = FastAPI(title="배터리 기상 예보 API", version="0.1.0-M0")
+app = FastAPI(title="배터리 기상 예보 API", version="0.1.0-M1")
 
 app.add_middleware(
     CORSMiddleware,
