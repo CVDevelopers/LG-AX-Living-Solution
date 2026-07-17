@@ -1,8 +1,9 @@
-"""Physics battery model v0 (SPEC §2.4 a·b).
+"""Physics battery model (SPEC §2.4 a·b·d).
 
-M0 scope: load model + discharge with rate-dependent effective capacity and AR(1)
-within-session noise. Degradation dynamics (d) and voltage/temperature channels (c)
-arrive in M2 — SoH is accepted as a fixed input here.
+Load model + discharge with rate-dependent effective capacity and AR(1) within-session noise
+(a·b), plus equivalent-full-cycle degradation (d). SoH is an input to a session; the generator
+carries a lifetime EFC accumulator forward so the device ages across its history (§2.4d, §3.2).
+Voltage/temperature channels (c) live in ``simulator/sensors.py``.
 
 The AR(1) term exists so the rule model's "constant rate within a session" assumption is
 NOT auto-satisfied by the simulator — evaluation keeps real-world difficulty (§2.4b).
@@ -11,6 +12,16 @@ NOT auto-satisfied by the simulator — evaluation keeps real-world difficulty (
 from backend.app import config
 
 from .detrng import DetRNG
+
+
+def efc_increment(dsoc_pct: float, mode: str) -> float:
+    """§2.4d EFC contribution of one discharge step: ΔSoC/100 × w_mode."""
+    return dsoc_pct / 100.0 * config.EFC_WEIGHT_BY_MODE[mode]
+
+
+def soh_from_efc(efc: float) -> float:
+    """§2.4d SoH = 1 − β·EFC, floored at 0.5 (well past the 80 % end-of-life mark)."""
+    return max(0.5, 1.0 - config.DEGRADATION_BETA * efc)
 
 
 def suction_power_w(mode: str, on_carpet: bool, dirt: float, avoid_per_min: float) -> float:
