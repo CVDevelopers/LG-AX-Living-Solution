@@ -1,0 +1,209 @@
+{
+ "headline": {
+  "time_mae_decision_band_min": 0.973,
+  "time_mae_overall_min": 3.579,
+  "treq_mae_min": 1.683,
+  "mape_pct": 6.38,
+  "coverage_pct": 84.9,
+  "state_agreement_pct": 98.3
+ },
+ "targets": {
+  "time_mae_min": 2.0,
+  "treq_mae_min": 2.0,
+  "mape_pct": 12.0,
+  "coverage_range": [
+   86.0,
+   94.0
+  ],
+  "state_agreement": 0.9,
+  "aging_mae_min": 2.5
+ },
+ "time_mae_by_start_band": {
+  "0-25": {
+   "n": 46,
+   "time_mae": 0.973
+  },
+  "25-50": {
+   "n": 90,
+   "time_mae": 2.277
+  },
+  "50-75": {
+   "n": 104,
+   "time_mae": 4.19
+  },
+  "75-100": {
+   "n": 118,
+   "time_mae": 5.048
+  }
+ },
+ "hardened_slices": {
+  "aging_soh_min_mae": {
+   "soh": 0.8,
+   "n": 5,
+   "time_mae": 0.709
+  },
+  "holdout_maps_mae": {
+   "n": 23,
+   "time_mae": 0.994
+  },
+  "train_maps_mae": {
+   "n": 23,
+   "time_mae": 0.952
+  },
+  "holdout_over_train_ratio": 1.044,
+  "ar1_decision_mae": {
+   "n": 46,
+   "time_mae": 0.973
+  },
+  "clean_seg_mape": {
+   "n": 358,
+   "mape_pct": 6.38
+  },
+  "mode_change_seg_mape": {
+   "n": 63,
+   "mape_pct": 8.19
+  },
+  "resume_seg_mape": {
+   "n": 223,
+   "mape_pct": 7.32
+  }
+ },
+ "reliability": [
+  {
+   "bin": [
+    0.0,
+    0.1
+   ],
+   "center": 0.05,
+   "n": 106,
+   "predicted": 0.004,
+   "observed": 0.0
+  },
+  {
+   "bin": [
+    0.1,
+    0.2
+   ],
+   "center": 0.15,
+   "n": 5,
+   "predicted": 0.152,
+   "observed": 0.2
+  },
+  {
+   "bin": [
+    0.2,
+    0.3
+   ],
+   "center": 0.25,
+   "n": 1,
+   "predicted": 0.298,
+   "observed": 0.0
+  },
+  {
+   "bin": [
+    0.3,
+    0.4
+   ],
+   "center": 0.35,
+   "n": 2,
+   "predicted": 0.354,
+   "observed": 0.0
+  },
+  {
+   "bin": [
+    0.4,
+    0.5
+   ],
+   "center": 0.45,
+   "n": 4,
+   "predicted": 0.437,
+   "observed": 0.5
+  },
+  {
+   "bin": [
+    0.5,
+    0.6
+   ],
+   "center": 0.55,
+   "n": 1,
+   "predicted": 0.589,
+   "observed": 1.0
+  },
+  {
+   "bin": [
+    0.6,
+    0.7
+   ],
+   "center": 0.65,
+   "n": 2,
+   "predicted": 0.634,
+   "observed": 0.5
+  },
+  {
+   "bin": [
+    0.7,
+    0.8
+   ],
+   "center": 0.75,
+   "n": 3,
+   "predicted": 0.74,
+   "observed": 0.667
+  },
+  {
+   "bin": [
+    0.8,
+    0.9
+   ],
+   "center": 0.85,
+   "n": 4,
+   "predicted": 0.879,
+   "observed": 1.0
+  },
+  {
+   "bin": [
+    0.9,
+    1.0
+   ],
+   "center": 0.95,
+   "n": 230,
+   "predicted": 0.995,
+   "observed": 0.996
+  }
+ ],
+ "counts": {
+  "total": 500,
+  "clean": 358,
+  "charged": 110,
+  "mode_change": 37,
+  "anomaly": 17,
+  "holdout": 200
+ },
+ "ablation": [
+  {
+   "stage": "raw",
+   "time_mae": 3.149,
+   "delta": null
+  },
+  {
+   "stage": "+ewma",
+   "time_mae": 3.025,
+   "delta": -0.124
+  },
+  {
+   "stage": "+shrink",
+   "time_mae": 3.912,
+   "delta": 0.887
+  },
+  {
+   "stage": "+drift",
+   "time_mae": 2.404,
+   "delta": -1.508
+  }
+ ],
+ "n_eval": 500,
+ "config": {
+  "per_slice": 100,
+  "hist_n": 60,
+  "eval_seed": 500042
+ }
+}
