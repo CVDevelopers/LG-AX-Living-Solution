@@ -80,12 +80,12 @@ make setup   # once: Python 3.11 venv + deps, frontend npm install
 make demo    # seed DB → FastAPI :8000 → Vite :5173
 ```
 
-Also useful: `make test`, `make eval` (quick-100 metrics), `make lint`, `make golden`.
+Also useful: `make test`, `make eval` (quick-100 metrics), `make eval500` (full §8.1 suite + reliability diagram + ablation), `make calibrate` (§2.5 gate + overlay), `make lint`, `make golden`.
 
 ## Roadmap
 - [x] **M0 — Core pipeline** · simulator v0, 60-session seed history, segment → base×drift → joint bootstrap, ForecastCard UI, CI gate + Vercel deploy live *(code complete — CI/Vercel gates activate on first push/import)*
 - [x] **M1 — Spatial layer** *(demo minimum)* · zone planner, trajectory heatmap, 부족A flow, next_plan carry-over
-- [ ] **M2 — Physics & evaluation** · aging/voltage/temperature channels, NASA·UNIBO calibration, eval-500 + reliability diagram + ablation
+- [x] **M2 — Physics & evaluation** · degradation + voltage/temperature channels, full §2.6 augmentation (holdout maps, anomaly, charge-resume), NASA·UNIBO calibration gate, eval-500 + reliability diagram + ablation, template narration `/report`
 - [ ] **M3 — LLM layer** · provider router (on-device ⇄ API ⇄ rules), guarded narration, dual-mode agent
 - [ ] **M4 — Learning engines & XAI** · v2 RLS + v3 LSTM behind a 5-condition promotion gate, SHAP `/explain`, "예보가 빗나간 날" demo
 - [ ] **M5 — Extended research & full demo** · fedsim 3-arm, agent workflows (history Q&A · diagnosis · weekly plan), SimView 2.5D

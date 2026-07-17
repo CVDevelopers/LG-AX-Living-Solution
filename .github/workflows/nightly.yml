@@ -1,0 +1,46 @@
+# Scheduled heavy jobs (§12.3) — kept off the PR gate to manage pipeline time (§12.2).
+# Nightly: full eval-500 (§8.1) + reliability diagram + ablation table; weekly-cadence calibration
+# gate (§2.5). Both are deterministic (fixed seeds), so a fresh run must reproduce the committed
+# artifacts byte-for-byte — drift means the simulator/estimator changed without regenerating.
+name: Nightly eval
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC nightly
+  workflow_dispatch: {}
+
+jobs:
+  eval-500:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+
+      - name: Full eval-500 (§8.1 metrics + reliability diagram + ablation table)
+        run: python -m eval.eval500
+
+      - name: Calibration + §2.5 gate (report + sim-vs-measured overlay)
+        run: python -m simulator.calibrate
+
+      - name: Report artifact drift vs committed (§12.3 — informational, not a hard gate)
+        run: |
+          echo "Diff of freshly regenerated artifacts vs the committed ones:"
+          git diff --stat eval/ data/calibration/ || true
+          git --no-pager diff eval/eval_report.md || true
+
+      - name: Upload evaluation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-artifacts
+          path: |
+            eval/report_eval500.json
+            eval/eval_report.md
+            eval/reliability_diagram.svg
+            eval/ablation_table.md
+            data/calibration/calibration_report.md
+            data/calibration/overlay_sim_vs_measured.svg

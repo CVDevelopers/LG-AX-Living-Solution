@@ -419,3 +419,99 @@ body {
   transform: translateX(-50%);
   z-index: 10;
 }
+
+/* Tabs: 예보 / 보고서 (§7.1) */
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background: #e8ecef;
+  border-radius: 10px;
+  padding: 4px;
+}
+.tab {
+  border: 0;
+  background: transparent;
+  border-radius: 8px;
+  padding: 8px 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.tab.active {
+  background: var(--card);
+  color: var(--teal-700);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+/* ReportView (§7.4) */
+.report-select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #d4d9de;
+  background: var(--card);
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+.narration p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.narration {
+  position: relative;
+}
+.fact-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chip {
+  font-size: 0.75rem;
+  background: var(--bg);
+  border: 1px solid #d4d9de;
+  border-radius: 999px;
+  padding: 3px 10px;
+  color: var(--ink);
+}
+.chip.warn {
+  background: var(--warn-bg);
+  border-color: currentColor;
+  color: var(--warn);
+}
+.factor-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+.factor-row {
+  display: grid;
+  grid-template-columns: 4.5em 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+}
+.factor-label {
+  color: var(--ink);
+  font-weight: 600;
+}
+.factor-track {
+  height: 10px;
+  background: #e8ecef;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.factor-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal-100), var(--teal-600));
+  border-radius: 5px;
+}
+.factor-val {
+  color: var(--ink-soft);
+  white-space: nowrap;
+}

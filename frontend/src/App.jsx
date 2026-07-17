@@ -7,12 +7,14 @@ import HeatmapView from './components/HeatmapView.jsx'
 import MessageBanner from './components/MessageBanner.jsx'
 import ModeSelector from './components/ModeSelector.jsx'
 import PlanOverlay from './components/PlanOverlay.jsx'
+import ReportView from './views/ReportView.jsx'
 
 const DEBOUNCE_MS = 250
 
 export default function App() {
   const [battery, setBattery] = useState(55) // opens on a rich heatmap gradient; slide to 18 % → 부족A
   const [mode, setMode] = useState('standard')
+  const [tab, setTab] = useState('forecast') // 예보 | 보고서 (§7.1)
   const [forecast, setForecast] = useState(null)
   const [heatmap, setHeatmap] = useState(null)
   const [plan, setPlan] = useState(null)
@@ -97,9 +99,31 @@ export default function App() {
   return (
     <div className="app">
       <BatteryHeader battery={battery} onChange={setBattery} />
+
+      <nav className="tabs" role="tablist">
+        <button
+          className={`tab ${tab === 'forecast' ? 'active' : ''}`}
+          role="tab"
+          aria-selected={tab === 'forecast'}
+          onClick={() => setTab('forecast')}
+        >
+          예보
+        </button>
+        <button
+          className={`tab ${tab === 'report' ? 'active' : ''}`}
+          role="tab"
+          aria-selected={tab === 'report'}
+          onClick={() => setTab('report')}
+        >
+          보고서
+        </button>
+      </nav>
+
       {error && <div className="error-box">서버에 연결할 수 없어요 — {error}</div>}
 
-      {carryover && (
+      {tab === 'report' && <ReportView />}
+
+      {tab === 'forecast' && carryover && (
         <section className="banner carryover" role="status">
           <p>
             지난번 미룬 <strong>{(carryover.zone_names ?? []).join('·') || '구역'}</strong>부터
@@ -116,23 +140,27 @@ export default function App() {
         </section>
       )}
 
-      <ForecastCard forecast={forecast} optimistic={optimistic} />
-      <HeatmapView heatmap={heatmap} plan={plan} showRoute={showRoute} />
-      <MessageBanner forecast={forecast} plan={plan} onSwitchMode={changeMode} />
-      {forecast?.state === 'shortage_a' && (
-        <PlanOverlay
-          plan={plan}
-          allZones={heatmap?.zones}
-          showRoute={showRoute}
-          deferred={deferred}
-          onCleanSubset={() => {
-            setShowRoute(true)
-            flash('완결 가능한 구역의 청소 경로를 표시했어요')
-          }}
-          onDefer={deferLeftover}
-        />
+      {tab === 'forecast' && (
+        <>
+          <ForecastCard forecast={forecast} optimistic={optimistic} />
+          <HeatmapView heatmap={heatmap} plan={plan} showRoute={showRoute} />
+          <MessageBanner forecast={forecast} plan={plan} onSwitchMode={changeMode} />
+          {forecast?.state === 'shortage_a' && (
+            <PlanOverlay
+              plan={plan}
+              allZones={heatmap?.zones}
+              showRoute={showRoute}
+              deferred={deferred}
+              onCleanSubset={() => {
+                setShowRoute(true)
+                flash('완결 가능한 구역의 청소 경로를 표시했어요')
+              }}
+              onDefer={deferLeftover}
+            />
+          )}
+          <ModeSelector mode={mode} forecast={forecast} onChange={changeMode} />
+        </>
       )}
-      <ModeSelector mode={mode} forecast={forecast} onChange={changeMode} />
 
       <footer className="footnote">
         예보·히트맵·구역 완결 확률은 동일한 결합 부트스트랩 분포에서 산출됩니다 (engine:{' '}

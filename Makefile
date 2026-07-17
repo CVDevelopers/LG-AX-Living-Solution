@@ -2,7 +2,7 @@
 
 PY := .venv/bin/python
 
-.PHONY: setup demo db-regen backend frontend test eval lint golden
+.PHONY: setup demo db-regen backend frontend test eval eval500 calibrate lint golden
 
 setup:  ## venv + Python deps + frontend deps
 	python3.11 -m venv .venv
@@ -29,8 +29,14 @@ frontend:
 test:
 	$(PY) -m pytest
 
-eval:  ## quick-100 metrics (§13 M0 DoD)
+eval:  ## quick-100 metrics (§13 M0 DoD, CI regression gate)
 	$(PY) -m eval.quick100
+
+eval500:  ## full eval-500 → §8.1 metrics + reliability diagram + ablation table (§8.5)
+	$(PY) -m eval.eval500
+
+calibrate:  ## open-dataset calibration + §2.5 gate → calibration_report + overlay (§8.5)
+	$(PY) -m simulator.calibrate
 
 lint:
 	.venv/bin/ruff check . && .venv/bin/black --check .

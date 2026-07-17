@@ -1,5 +1,6 @@
 # PR gate (§12.2) — any failure blocks merge.
-# M1 adds the CVD-contrast accessibility assertion; nightly/weekly jobs arrive per §12.3.
+# M1 added the CVD-contrast accessibility assertion; M2 adds the sensor/degradation/eval/report
+# tests to pytest (the heavy eval-500 stays on the nightly schedule, nightly.yml, §12.3).
 name: CI
 
 on:

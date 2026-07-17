@@ -57,3 +57,12 @@ export function getPlan({ battery, zones }) {
 export function getSessions() {
   return request('/api/sessions')
 }
+
+/**
+ * §9.5 session report: structured facts + §3.6 factor decomposition + §9.6 template narration.
+ * @param {string} sessionId
+ * @returns {Promise<object>} {facts, factors:[{feature,label,direction,contribution_min}], narration}
+ */
+export function getReport(sessionId) {
+  return request(`/api/report/${encodeURIComponent(sessionId)}`)
+}
