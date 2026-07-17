@@ -79,7 +79,11 @@ def draw_joint(
     clean = [
         s
         for s in session_stats
-        if s.mode_changes == 0 and s.duration_min > 0 and s.cleaned_area_m2 > 0 and s.dsoc > 0
+        if s.mode_changes == 0
+        and not s.charged  # charge-resume sessions: session-level rate is contaminated (§3.1)
+        and s.duration_min > 0
+        and s.cleaned_area_m2 > 0
+        and s.dsoc > 0
     ]
     per_mode_pool: dict[str, list[int]] = {
         m: [i for i, s in enumerate(clean) if s.mode == m] for m in config.MODES

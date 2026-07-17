@@ -110,7 +110,11 @@ def fit_speed(session_stats: list[SessionStat]) -> dict[str, float]:
         usable = [
             s
             for s in session_stats
-            if s.mode == m and s.mode_changes == 0 and s.duration_min > 0 and s.cleaned_area_m2 > 0
+            if s.mode == m
+            and s.mode_changes == 0
+            and not s.charged  # exclude charge-resume sessions (§3.1)
+            and s.duration_min > 0
+            and s.cleaned_area_m2 > 0
         ]
         if not usable:
             continue

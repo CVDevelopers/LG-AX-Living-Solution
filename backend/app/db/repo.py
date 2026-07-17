@@ -46,7 +46,8 @@ def load_history(db: OrmSession) -> tuple[list[Segment], list[SessionStat]]:
     segments: list[Segment] = []
     stats: list[SessionStat] = []
     for age, s in enumerate(sessions):
-        segments.extend(extract_session_segments(ticks_by_session[s.session_id], age))
+        session_ticks = ticks_by_session[s.session_id]
+        segments.extend(extract_session_segments(session_ticks, age))
         stats.append(
             SessionStat(
                 age=age,
@@ -56,6 +57,9 @@ def load_history(db: OrmSession) -> tuple[list[Segment], list[SessionStat]]:
                 carpet_ratio=s.carpet_ratio,
                 mode_changes=s.mode_changes,
                 dsoc=s.start_battery - s.end_battery,
+                # A charging interval means the session-level rate is contaminated (§3.1); the
+                # segments already exclude it, so flag it out of the predictive session layer too.
+                charged=any(chg == 1 for (_, _, _, chg) in session_ticks),
             )
         )
     return segments, stats
