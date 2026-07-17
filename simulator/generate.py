@@ -20,9 +20,11 @@ from backend.app import config
 from backend.app.db.models import Base
 from backend.app.db.session import make_engine
 
-from .augment import sample_plan
+from .augment import sample_plan, zone_avg_dirt
+from .battery import soh_from_efc
 from .detrng import DetRNG
 from .rover import simulate_session
+from .sensors import simulate_sensor_trace
 from .world import MapData, load_map
 
 BASE_STARTED_AT = datetime(2026, 5, 10, 0, 0)  # fixed epoch for reproducibility
@@ -35,6 +37,7 @@ def build_db(
     n_sessions: int = config.HISTORY_SESSIONS,
     map_path: str | Path = SEED_MAP_PATH,
     allow_mode_change: bool = True,
+    with_sensors: bool = True,
 ) -> MapData:
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -42,6 +45,7 @@ def build_db(
         out_path.unlink()
 
     world = load_map(map_path)
+    avg_dirt = zone_avg_dirt(world)  # per-zone habitual dirt → predictor's T_req input (§2.6)
     rng = DetRNG(seed)
     engine = make_engine(out_path, read_only=False)
     Base.metadata.create_all(engine)
@@ -50,7 +54,7 @@ def build_db(
         con.executemany(
             "INSERT INTO zones VALUES (?,?,?,?,?)",
             [
-                (z.zone_id, z.name, z.area_m2, z.carpet_ratio, config.DIRT_MEAN)
+                (z.zone_id, z.name, z.area_m2, z.carpet_ratio, round(avg_dirt[z.zone_id], 2))
                 for z in world.zones.values()
             ],
         )
@@ -59,8 +63,12 @@ def build_db(
             (world.map_id, world.name, json.dumps(world.raw, ensure_ascii=False)),
         )
 
+        # The device ages across its lifetime: EFC accumulates so SoH declines session to session,
+        # giving the shared drift (§3.2) a real aging trend to track. Starts mid-life (§2.4d).
+        efc = config.SIM_INITIAL_EFC
         for i in range(n_sessions):
-            plan = sample_plan(world, rng, allow_mode_change=allow_mode_change)
+            soh = round(soh_from_efc(efc), 4)
+            plan = sample_plan(world, rng, allow_mode_change=allow_mode_change, soh=soh)
             sim = simulate_session(world, plan, rng)
             session_id = f"S{seed}-{i:04d}"
             started = BASE_STARTED_AT + timedelta(days=i, hours=8 + rng.integers(0, 12))
@@ -91,6 +99,27 @@ def build_db(
                     for t in sim.ticks
                 ],
             )
+            if with_sensors:
+                # Retention (§2.3): 1 s raw for the most recent N sessions, 1 min summary earlier.
+                res_s = 1 if i >= n_sessions - config.SENSOR_RECENT_SESSIONS else 60
+                samples = simulate_sensor_trace(sim.minute_states, soh, rng, resolution_s=res_s)
+                con.executemany(
+                    "INSERT INTO sensor_ticks VALUES (?,?,?,?,?,?,?,?)",
+                    [
+                        (
+                            session_id,
+                            s.t_sec,
+                            s.voltage_v,
+                            s.current_a,
+                            s.temp_c,
+                            s.motor_pwm,
+                            s.wheel_speed_mps,
+                            s.event,
+                        )
+                        for s in samples
+                    ],
+                )
+            efc += sim.efc_delta
         con.commit()
     return world
 

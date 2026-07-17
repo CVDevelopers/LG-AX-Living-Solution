@@ -52,6 +52,12 @@ def _eval_sessions(db_path: Path) -> list[dict]:
             (s["session_id"],),
         ).fetchall()
         s["zones"] = sorted(z for (z,) in zone_rows)
+        # Charge-resume sessions have a charging interval → their session-level rate and duration
+        # are contaminated (§3.1); they are scored as a hardened slice by eval-500, not here.
+        (charged,) = con.execute(
+            "SELECT COUNT(*) FROM ticks WHERE session_id=? AND charging=1", (s["session_id"],)
+        ).fetchone()
+        s["charged"] = charged > 0
     con.close()
     return sessions
 
@@ -65,11 +71,18 @@ def run(history_db: Path = None, n_eval: int = config.QUICK_EVAL_SESSIONS) -> di
 
     with tempfile.TemporaryDirectory() as tmp:
         eval_db = Path(tmp) / "eval.db"
-        build_db(eval_db, seed=config.QUICK_EVAL_SEED, n_sessions=n_eval, allow_mode_change=False)
+        build_db(
+            eval_db,
+            seed=config.QUICK_EVAL_SEED,
+            n_sessions=n_eval,
+            allow_mode_change=False,
+            with_sensors=False,  # quick suite reads sessions/ticks only
+        )
         sessions = _eval_sessions(eval_db)
 
     time_err, treq_err, ape, covered = [], [], [], 0
-    for s in sessions:
+    scored = [s for s in sessions if not s["charged"]]  # clean-discharge sessions only (§3.1)
+    for s in scored:
         zones = [all_zones[z] for z in s["zones"]]
         out = predict(s["start"], s["mode"], zones, segments, stats)
         r_actual = (s["start"] - s["end"]) / s["duration"]
