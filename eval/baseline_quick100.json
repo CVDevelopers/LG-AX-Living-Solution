@@ -1,12 +1,12 @@
 {
  "n_eval": 100,
- "n_scored": 100,
- "n_completed": 92,
- "time_mae_min": 4.804,
- "treq_mae_min": 1.584,
- "mape_pct": 5.01,
- "coverage_pct": 95.0,
+ "n_scored": 96,
+ "n_completed": 88,
+ "time_mae_min": 5.491,
+ "treq_mae_min": 2.02,
+ "mape_pct": 5.55,
+ "coverage_pct": 90.6,
  "history_sessions": 60,
- "segments_used": 68,
+ "segments_used": 67,
  "eval_seed": 4242
 }
