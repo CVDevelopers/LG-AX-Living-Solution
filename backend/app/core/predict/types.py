@@ -32,6 +32,7 @@ class SessionStat:
     carpet_ratio: float
     mode_changes: int = 0
     dsoc: float = 0.0  # start_battery − end_battery (session-level consumption)
+    charged: bool = False  # charge-resume session → session-level rate is contaminated (§3.1)
 
 
 @dataclass(frozen=True)
