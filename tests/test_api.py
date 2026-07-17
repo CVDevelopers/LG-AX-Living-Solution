@@ -123,6 +123,24 @@ def test_next_plan_roundtrip(client):
     assert client.get("/api/next-plan").json()["next_plan"] is None
 
 
+def test_report_shape_and_narration(client):
+    sessions = client.get("/api/sessions").json()
+    sid = sessions[0]["session_id"]
+    r = client.get(f"/api/report/{sid}")
+    assert r.status_code == 200
+    body = r.json()
+    assert set(body) == {"facts", "factors", "narration"}
+    assert body["facts"]["session_id"] == sid
+    assert len(body["factors"]) == 4
+    assert {f["feature"] for f in body["factors"]} == {"obstacle", "carpet", "dirt", "aging"}
+    assert body["narration"]["guardrail_ok"] is True
+    assert body["narration"]["text"]
+
+
+def test_report_unknown_session_404(client):
+    assert client.get("/api/report/NOPE").status_code == 404
+
+
 def test_generator_is_deterministic(tmp_path):
     a, b = tmp_path / "a.db", tmp_path / "b.db"
     build_db(a, seed=7, n_sessions=6)

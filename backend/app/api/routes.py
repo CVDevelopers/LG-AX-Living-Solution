@@ -1,9 +1,12 @@
-"""M0–M1 REST endpoints (§6): /api/predict /heatmap /plan /next-plan /sessions /simulate /health.
+"""M0–M2 REST endpoints (§6): /api/predict /heatmap /plan /next-plan /sessions /report
+/simulate /health.
 
-Remaining §6 endpoints arrive with their milestones: /report /explain (M2+), /llm/proxy (M3),
-/history /plan-week (M5).
+Remaining §6 endpoints arrive with their milestones: /explain SHAP contract (M4), /llm/proxy
+(M3), /history /plan-week (M5). The M2 /report already carries the §3.6 v1 rule factor
+decomposition its narration cites.
 """
 
+from dataclasses import asdict
 from datetime import UTC, datetime
 from typing import Annotated
 
@@ -16,9 +19,12 @@ from sqlalchemy.orm import Session as OrmSession
 from .. import config
 from ..core.predict import predict as core_predict
 from ..core.predict.engine import RuleEngineV1
+from ..core.predict.estimator import fit_estimator
 from ..core.predict.state import CAUTION, SHORTAGE_A, SHORTAGE_B, SUFFICIENT
 from ..db import models, repo
 from ..db.session import make_session_factory
+from ..report import build_facts, explain_session, narrate
+from ..report.facts import ZoneFact
 from . import spatial
 
 router = APIRouter(prefix="/api")
@@ -230,6 +236,41 @@ def sessions(db: DbDep) -> list[dict]:
         }
         for s in rows
     ]
+
+
+@router.get("/report/{session_id}")
+def report(db: DbDep, session_id: str) -> dict:
+    """§9.5 report: structured session facts + §3.6 v1 factor decomposition + §9.6 narration."""
+    row = db.get(models.Session, session_id)
+    if row is None:
+        raise HTTPException(404, "no such session")
+    ticks = db.scalars(select(models.Tick).where(models.Tick.session_id == session_id)).all()
+    cleaned = sorted({t.zone_id for t in ticks if t.zone_id is not None})
+    charged = any(t.charging == 1 for t in ticks)
+    zones_by_id = {z.zone_id: ZoneFact(z.zone_id, z.name, z.avg_dirt) for z in repo.load_zones(db)}
+    session = {
+        "session_id": row.session_id,
+        "started_at": row.started_at,
+        "mode": row.mode,
+        "start_battery": row.start_battery,
+        "end_battery": row.end_battery,
+        "duration_min": row.duration_min,
+        "cleaned_area_m2": row.cleaned_area_m2,
+        "carpet_ratio": row.carpet_ratio,
+        "obstacle_hits": row.obstacle_hits,
+        "dock_returns": row.dock_returns,
+        "mode_changes": row.mode_changes,
+        "completed": row.completed,
+        "soh_at_run": row.soh_at_run,
+    }
+    facts = build_facts(session, cleaned, zones_by_id, charged)
+    segments, _ = repo.load_history(db)
+    factors = explain_session(facts, drift=fit_estimator(segments).drift)
+    return {
+        "facts": asdict(facts),
+        "factors": [asdict(f) for f in factors],
+        "narration": narrate(facts, factors),
+    }
 
 
 class SimulateBody(BaseModel):
