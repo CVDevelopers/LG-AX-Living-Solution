@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 360" width="560" height="360" font-family="system-ui">
+
+<style>
+  .bg{fill:#ffffff}.axis{stroke:#444;stroke-width:1}.grid{stroke:#e5e7eb;stroke-width:1}
+  .lbl{fill:#444;font:13px system-ui,sans-serif}.ttl{fill:#111;font:600 15px system-ui,sans-serif}
+  .tick{fill:#666;font:11px system-ui,sans-serif}
+  @media (prefers-color-scheme: dark){
+    .bg{fill:#0f1115}.axis{stroke:#c9ced6}.grid{stroke:#2a2f3a}
+    .lbl{fill:#c9ced6}.ttl{fill:#f3f4f6}.tick{fill:#9aa3b2}}
+</style>
+
+<rect class="bg" x="0" y="0" width="560" height="360"/>
+<text x="301.0" y="20" text-anchor="middle" class="ttl">OCV: sim vs measured (RMSE 28.1 mV/cell)</text>
+<line x1="60.0" y1="34.0" x2="60.0" y2="314.0" class="grid"/>
+<text x="60.0" y="330.0" text-anchor="middle" class="tick">0.0</text>
+<line x1="156.4" y1="34.0" x2="156.4" y2="314.0" class="grid"/>
+<text x="156.4" y="330.0" text-anchor="middle" class="tick">0.2</text>
+<line x1="252.8" y1="34.0" x2="252.8" y2="314.0" class="grid"/>
+<text x="252.8" y="330.0" text-anchor="middle" class="tick">0.4</text>
+<line x1="349.2" y1="34.0" x2="349.2" y2="314.0" class="grid"/>
+<text x="349.2" y="330.0" text-anchor="middle" class="tick">0.6</text>
+<line x1="445.6" y1="34.0" x2="445.6" y2="314.0" class="grid"/>
+<text x="445.6" y="330.0" text-anchor="middle" class="tick">0.8</text>
+<line x1="542.0" y1="34.0" x2="542.0" y2="314.0" class="grid"/>
+<text x="542.0" y="330.0" text-anchor="middle" class="tick">1.0</text>
+<line x1="60.0" y1="288.55" x2="542.0" y2="288.55" class="grid"/>
+<text x="52.0" y="292.55" text-anchor="end" class="tick">12</text>
+<line x1="60.0" y1="237.64" x2="542.0" y2="237.64" class="grid"/>
+<text x="52.0" y="241.64" text-anchor="end" class="tick">13</text>
+<line x1="60.0" y1="186.73" x2="542.0" y2="186.73" class="grid"/>
+<text x="52.0" y="190.73" text-anchor="end" class="tick">14</text>
+<line x1="60.0" y1="135.82" x2="542.0" y2="135.82" class="grid"/>
+<text x="52.0" y="139.82" text-anchor="end" class="tick">15</text>
+<line x1="60.0" y1="84.91" x2="542.0" y2="84.91" class="grid"/>
+<text x="52.0" y="88.91" text-anchor="end" class="tick">16</text>
+<line x1="60.0" y1="34.0" x2="542.0" y2="34.0" class="grid"/>
+<text x="52.0" y="38.0" text-anchor="end" class="tick">17</text>
+<line x1="60.0" y1="314.0" x2="542.0" y2="314.0" class="axis"/>
+<line x1="60.0" y1="34.0" x2="60.0" y2="314.0" class="axis"/>
+<polyline points="60.0,288.55 69.64,273.61 79.28,258.68 88.92,243.75 98.56,228.81 108.2,213.88 117.84,198.95 127.48,184.01 137.12,175.38 146.76,173.05 156.4,170.73 166.04,168.4 175.68,166.07 185.32,163.75 194.96,161.42 204.6,159.09 214.24,156.76 223.88,154.44 233.52,152.11 243.16,149.78 252.8,147.45 262.44,145.13 272.08,142.8 281.72,140.47 291.36,138.15 301.0,135.82 310.64,133.49 320.28,131.16 329.92,128.84 339.56,126.51 349.2,124.18 358.84,121.85 368.48,119.53 378.12,117.2 387.76,114.87 397.4,112.55 407.04,110.22 416.68,107.89 426.32,105.56 435.96,103.24 445.6,100.91 455.24,98.58 464.88,96.25 474.52,91.7 484.16,84.91 493.8,78.12 503.44,71.33 513.08,64.55 522.72,57.76 532.36,50.97 542.0,44.18" fill="none" stroke="#0f766e" stroke-width="2.5"/>
+<polyline points="60.0,281.9 69.64,268.78 79.28,255.66 88.92,242.54 98.56,229.43 108.2,216.31 117.84,203.19 127.48,190.07 137.12,182.22 146.76,179.62 156.4,177.02 166.04,174.42 175.68,171.82 185.32,169.22 194.96,166.62 204.6,164.02 214.24,161.42 223.88,158.82 233.52,156.22 243.16,153.62 252.8,151.02 262.44,148.42 272.08,145.82 281.72,143.22 291.36,140.62 301.0,138.02 310.64,135.42 320.28,132.82 329.92,130.22 339.56,127.62 349.2,125.02 358.84,122.43 368.48,119.83 378.12,117.23 387.76,114.63 397.4,112.03 407.04,109.43 416.68,106.83 426.32,104.23 435.96,101.63 445.6,99.03 455.24,96.43 464.88,93.83 474.52,89.23 484.16,82.64 493.8,76.04 503.44,69.45 513.08,62.85 522.72,56.26 532.36,49.66 542.0,43.07" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+<circle cx="542.0" cy="44.18" r="3.5" fill="#dc2626"/>
+<circle cx="493.8" cy="72.69" r="3.5" fill="#dc2626"/>
+<circle cx="445.6" cy="95.09" r="3.5" fill="#dc2626"/>
+<circle cx="397.4" cy="113.42" r="3.5" fill="#dc2626"/>
+<circle cx="349.2" cy="127.67" r="3.5" fill="#dc2626"/>
+<circle cx="301.0" cy="141.93" r="3.5" fill="#dc2626"/>
+<circle cx="252.8" cy="154.15" r="3.5" fill="#dc2626"/>
+<circle cx="204.6" cy="164.33" r="3.5" fill="#dc2626"/>
+<circle cx="156.4" cy="176.55" r="3.5" fill="#dc2626"/>
+<circle cx="132.3" cy="186.73" r="3.5" fill="#dc2626"/>
+<circle cx="108.2" cy="207.09" r="3.5" fill="#dc2626"/>
+<circle cx="84.1" cy="243.75" r="3.5" fill="#dc2626"/>
+<circle cx="60.0" cy="288.55" r="3.5" fill="#dc2626"/>
+<text x="301.0" y="352" text-anchor="middle" class="lbl">State of charge</text>
+<text x="16" y="180.0" text-anchor="middle" class="lbl" transform="rotate(-90 16 180.0)">Pack voltage (V)</text>
+<rect x="392" y="31" width="12" height="12" fill="#0f766e"/>
+<text x="410" y="41" class="tick" text-anchor="start">model (default)</text>
+<rect x="392" y="49" width="12" height="12" fill="#f59e0b"/>
+<text x="410" y="59" class="tick" text-anchor="start">fit</text>
+<rect x="392" y="67" width="12" height="12" fill="#dc2626"/>
+<text x="410" y="77" class="tick" text-anchor="start">measured</text>
+</svg>
